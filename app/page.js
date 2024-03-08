@@ -3,14 +3,27 @@
 import { useChat } from 'ai/react';
 import { initialMessagesChat } from "@/app/lib/constants";
 
-export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+export default function Page() {
+  const {
+    messages: messagesChat,
+    input: inputChat,
+    handleInputChange: handleInputChangeChat,
+    handleSubmit: handleSubmitChat,
+  } = useChat({
     initialMessages: initialMessagesChat,
   });
 
+  function handleInputChange(event) {
+    handleInputChangeChat(event);
+  }
+  function handleSubmit(event) {
+    event.preventDefault();
+    handleSubmitChat(event);
+  }
+
   return (
     <div>
-      {messages.map(m => (
+      {messagesChat.map(m => (
         <div key={m.id}>
           {m.role === 'user' ? 'User: ' : 'AI: '}
           {m.content}
@@ -20,7 +33,7 @@ export default function Chat() {
       <form onSubmit={handleSubmit}>
         <label>
           Say something...
-          <input value={input} onChange={handleInputChange} />
+          <input value={inputChat} onChange={handleInputChange} />
         </label>
         <button type="submit">Send</button>
       </form>
