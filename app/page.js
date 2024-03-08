@@ -2,9 +2,10 @@
 
 import {useState} from "react";
 import {useChat} from 'ai/react';
-import {initialMessagesChat, initialMessagesSpeech} from "@/app/lib/constants";
+import {initialMessagesChat, initialMessagesSpeech, initialMessagesImage} from "@/app/lib/constants";
 import Chat from "@/app/components/Chat";
 import Speech from "@/app/components/Speech";
+import Image from "@/app/components/Image";
 
 const styles = {
   user: "text-right bg-blue-100 ml-auto",
@@ -14,6 +15,8 @@ const styles = {
 
 export default function Page() {
   const [speechCopy, setSpeechCopy] = useState("");
+  const [imagePrompt, setImagePrompt] = useState("");
+
   const {
     messages: messagesChat,
     input: inputChat,
@@ -33,9 +36,19 @@ export default function Page() {
     onFinish: (msg) => setSpeechCopy(msg.content)
   });
 
+  const {
+    isLoading: isLoadingImage,
+    handleSubmit: handleSubmitImage,
+    setInput: setInputImage,
+  } = useChat({
+    initialMessages: initialMessagesImage,
+    onFinish: (msg) => setImagePrompt(msg.content)
+  });
+
   function handleInputChange(event) {
     handleInputChangeChat(event);
     setInputSpeech(event.target.value);
+    setInputImage(event.target.value);
   }
 
   function handleSubmit(event) {
@@ -45,10 +58,15 @@ export default function Page() {
     if (speechCopy.length === 0) {
       handleSubmitSpeech(event);
     }
+
+    if (imagePrompt.length === 0) {
+      handleSubmitImage(event);
+    }
   }
 
   return (
     <main className="w-full lg:w-1/2 m-auto max-w-sm p-4">
+      <Image prompt={imagePrompt} loading={isLoadingImage} />
       <Speech input={speechCopy} loading={isLoadingSpeech}/>
       <Chat
         messages={messagesChat}

@@ -21,3 +21,13 @@ export const initialMessagesSpeech = [
     `
   }
 ];
+
+export const initialMessagesImage = [
+  {
+    id: "001",
+    role: "system",
+    content: `
+     You turn given input into descriptive images, in the style of Picasso.
+    `
+  }
+];
