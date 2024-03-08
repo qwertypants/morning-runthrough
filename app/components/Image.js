@@ -4,6 +4,35 @@ export default function Image({prompt = "", loading}) {
   const [imgSrc, setImageSrc] = useState("");
   const [isLoading, setIsLoading] = useState(loading);
 
+  const [isVisionLoading, setIsVisionLoading] = useState(false);
+  const [figCaption, setFigCaption] = useState("");
+
+  async function handleVision(url){
+    try {
+      setIsVisionLoading(true);
+
+      const res = await fetch('/api/vision', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url })
+      });
+
+      const caption = await res.text();
+      setFigCaption(caption);
+
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsVisionLoading(false);
+    }
+
+
+
+  }
+
   async function handleImage(prompt) {
     try {
       setIsLoading(true);
@@ -38,6 +67,14 @@ export default function Image({prompt = "", loading}) {
     }
   }, [prompt]);
 
+
+  useEffect(() => {
+    if (imgSrc) {
+      (async () => await handleVision(imgSrc))();
+    }
+  }, [imgSrc]);
+
+
   return (
     <div>
       {!imgSrc || isLoading ?
@@ -46,7 +83,12 @@ export default function Image({prompt = "", loading}) {
           ${isLoading ? "animate-pulse" : ""}
           `}
         />:
-        <img src={imgSrc} alt={prompt} />
+        <figure>
+          <img src={imgSrc} alt={prompt}/>
+          <figcaption className="text-center">
+            { isVisionLoading ? "Loading..." : figCaption}
+          </figcaption>
+        </figure>
       }
     </div>
   );
