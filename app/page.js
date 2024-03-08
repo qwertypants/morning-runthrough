@@ -1,8 +1,10 @@
 'use client';
 
+import {useState} from "react";
 import {useChat} from 'ai/react';
-import {initialMessagesChat} from "@/app/lib/constants";
+import {initialMessagesChat, initialMessagesSpeech} from "@/app/lib/constants";
 import Chat from "@/app/components/Chat";
+import Speech from "@/app/components/Speech";
 
 const styles = {
   user: "text-right bg-blue-100 ml-auto",
@@ -11,6 +13,7 @@ const styles = {
 }
 
 export default function Page() {
+  const [speechCopy, setSpeechCopy] = useState("");
   const {
     messages: messagesChat,
     input: inputChat,
@@ -21,17 +24,32 @@ export default function Page() {
     initialMessages: initialMessagesChat,
   });
 
+  const {
+    isLoading: isLoadingSpeech,
+    handleSubmit: handleSubmitSpeech,
+    setInput: setInputSpeech,
+  } = useChat({
+    initialMessages: initialMessagesSpeech,
+    onFinish: (msg) => setSpeechCopy(msg.content)
+  });
+
   function handleInputChange(event) {
     handleInputChangeChat(event);
+    setInputSpeech(event.target.value);
   }
 
   function handleSubmit(event) {
     event.preventDefault();
     handleSubmitChat(event);
+
+    if (speechCopy.length === 0) {
+      handleSubmitSpeech(event);
+    }
   }
 
   return (
     <main className="w-full lg:w-1/2 m-auto max-w-sm p-4">
+      <Speech input={speechCopy} loading={isLoadingSpeech}/>
       <Chat
         messages={messagesChat}
         onSubmit={handleSubmit}
@@ -41,13 +59,13 @@ export default function Page() {
       >
         <div>
           {messagesChat.map((m, index) => {
-            // if (index <= initialMessagesChat.length) return;
+            if (index <= initialMessagesChat.length) return;
             const {role, id, content, createdAt = new Date()} = m;
 
             return (
               <div key={id}>
                 <div className={
-                `${styles[role]} rounded-2xl p-4 my-2 max-w-64`
+                  `${styles[role]} rounded-2xl p-4 my-2 max-w-64`
                 }>
                   <p>{content}</p>
                 </div>

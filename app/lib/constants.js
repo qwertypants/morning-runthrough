@@ -10,3 +10,14 @@ export const initialMessagesChat = [
     `
   }
 ]
+
+export const initialMessagesSpeech = [
+  {
+    id: "001",
+    role: "system",
+    content: `
+    ${persona}
+     You specialize in transforming input into concise, engaging language that captures the essence of the original message.
+    `
+  }
+];
